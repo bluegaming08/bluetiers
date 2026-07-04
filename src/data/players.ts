@@ -31,7 +31,7 @@ const players: Player[] = [
   {
     name: "Blue_Gaming08",
     head: "https://mc-heads.net/avatar/Blue_Gaming08",
-    region: "North America",
+    region: "Asia",
     ranks: {
       sword: "HT5",
       axe: "HT5",
@@ -45,7 +45,7 @@ const players: Player[] = [
   {
     name: "Cyan_Gaming07",
     head: "https://mc-heads.net/avatar/Cyan_Gaming07",
-    region: "Europe",
+    region: "Asia",
     ranks: {
       sword: "LT5",
       uhc: "LT5",
