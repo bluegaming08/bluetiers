@@ -68,6 +68,6 @@ const players: Player[] = [
       axe: "NONE",
       nethpot: "NONE",
       diapot: "NONE",
-]
+}
 
 export default players
