@@ -56,6 +56,18 @@ const players: Player[] = [
       diapot: "LT5",
     },
   },
+  {
+    name: "D3n1s1",
+    head: "https://mc-heads.net/avatar/D3n1s1",
+    region: "Europe",
+    ranks: {
+      sword: "NONE",
+      uhc: "NONE",
+      crystal: "HT5",
+      mace: "NONE",
+      axe: "NONE",
+      nethpot: "NONE",
+      diapot: "NONE",
 ]
 
 export default players
