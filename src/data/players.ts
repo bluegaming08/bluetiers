@@ -84,6 +84,20 @@ const players: Player[] = [
       diapot: "NONE",
     },
   },
+  {
+    name: "nikkgming896",
+    head: "https://mc-heads.net/avatar/nikkgming896",
+    region: "Asia",
+    ranks: {
+      sword: "HT5",
+      uhc: "HT5",
+      crystal: "NONE",
+      mace: "NONE",
+      axe: "LT4",
+      nethpot: "NONE",
+      diapot: "NONE",
+    },
+  },
 ]
 
 export default players
