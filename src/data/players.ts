@@ -98,6 +98,34 @@ const players: Player[] = [
       diapot: "LT4",
     },
   },
+  {
+    name: "BlackTagX",
+    head: "https://mc-heads.net/avatar/BlackTagX",
+    region: "Asia",
+    ranks: {
+      sword: "LT4",
+      uhc: "NONE",
+      crystal: "NONE",
+      mace: "NONE",
+      axe: "LT4",
+      nethpot: "NONE",
+      diapot: "NONE",
+    },
+  },
+  {
+    name: "WyoCold",
+    head: "https://mc-heads.net/avatar/WyoCold",
+    region: "Asia",
+    ranks: {
+      sword: "HT4",
+      uhc: "NONE",
+      crystal: "NONE",
+      mace: "NONE",
+      axe: "NONE",
+      nethpot: "NONE",
+      diapot: "NONE",
+    },
+  },
 ]
 
 export default players
