@@ -66,7 +66,7 @@ const players: Player[] = [
       crystal: "HT5",
       mace: "LT3",
       axe: "LT4",
-      nethpot: "NONE",
+      nethpot: "LT3",
       diapot: "HT4",
     },
   },
