@@ -147,7 +147,7 @@ const players: Player[] = [
     ranks: {
       sword: "NONE",
       uhc: "NONE",
-      crystal: "NONE",
+      crystal: "HT5",
       mace: "HT2",
       axe: "NONE",
       nethpot: "NONE",
@@ -202,7 +202,7 @@ const players: Player[] = [
     region: "North America",
     ranks: {
       sword: "NONE",
-      uhc: "NONE",
+      uhc: "LT4",
       crystal: "NONE",
       mace: "LT2",
       axe: "NONE",
