@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { Navbar } from '../components/Navbar'
 import { Footer } from '../components/Footer'
@@ -6,6 +6,7 @@ import { PlayerCard, gamemodes, tierColors, TIER_ORDER } from '../components/Pla
 import type { PlayerRanks } from '../data/players'
 import players from '../data/players'
 import { computeRankings, tierSortValue, TIER_POINTS } from '../data/tiers'
+import { ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight } from 'lucide-react'
 
 export const Route = createFileRoute('/rankings')({
   component: RankingsPage,
@@ -13,11 +14,21 @@ export const Route = createFileRoute('/rankings')({
 
 type SortMode = 'points-desc' | 'points-asc' | 'name-asc' | 'name-desc'
 
+const PLAYERS_PER_PAGE = 25
+
 function RankingsPage() {
   const [search, setSearch] = useState('')
   const [activeFilter, setActiveFilter] = useState<keyof PlayerRanks | 'all'>('all')
   const [sortMode, setSortMode] = useState<SortMode>('points-desc')
   const [minTier, setMinTier] = useState<string>('all')
+  
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1)
+  const [isFading, setIsFading] = useState(false)
+  const [renderPage, setRenderPage] = useState(1)
+
+  // Ref to the search/filters section so we can smooth scroll to it
+  const rankingsSectionRef = useRef<HTMLDivElement>(null)
 
   // Compute global rankings once — these never change with filter/sort
   const globalRankings = useMemo(() => computeRankings(players), [])
@@ -61,6 +72,41 @@ function RankingsPage() {
         return 0
       })
   }, [search, activeFilter, sortMode, minTier, globalRankings])
+
+  // Reset to first page when any search, filter, or sort changes
+  useEffect(() => {
+    setCurrentPage(1)
+    setRenderPage(1)
+  }, [search, activeFilter, sortMode, minTier])
+
+  // Calculate pages
+  const totalPages = Math.ceil(filtered.length / PLAYERS_PER_PAGE) || 1
+
+  // Get current page players
+  const paginatedPlayers = useMemo(() => {
+    const startIndex = (renderPage - 1) * PLAYERS_PER_PAGE
+    const endIndex = startIndex + PLAYERS_PER_PAGE
+    return filtered.slice(startIndex, endIndex)
+  }, [filtered, renderPage])
+
+  // Handle page changes with smooth animations and scrolling
+  const handlePageChange = (newPage: number) => {
+    if (newPage < 1 || newPage > totalPages || newPage === currentPage) return
+
+    setIsFading(true)
+    setCurrentPage(newPage)
+
+    // Smooth scroll to rankings section
+    if (rankingsSectionRef.current) {
+      rankingsSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+
+    // After fade-out, switch data and fade back in
+    setTimeout(() => {
+      setRenderPage(newPage)
+      setIsFading(false)
+    }, 200) // Duration matching CSS transition
+  }
 
   const sortOptions: { value: SortMode; label: string }[] = [
     { value: 'points-desc', label: 'Points (High → Low)' },
@@ -118,7 +164,7 @@ function RankingsPage() {
       </section>
 
       {/* Search + Filters */}
-      <section className="px-4 pb-8">
+      <section ref={rankingsSectionRef} className="px-4 pb-8 scroll-mt-24">
         <div className="max-w-6xl mx-auto space-y-4">
           {/* Search */}
           <div className="relative">
@@ -218,24 +264,96 @@ function RankingsPage() {
         <div className="max-w-6xl mx-auto">
           {filtered.length > 0 ? (
             <>
-              <div className="text-gray-600 text-xs mb-4">
-                {filtered.length} player{filtered.length !== 1 ? 's' : ''} found
-                {activeFilter !== 'all' && ` in ${gamemodes.find(g => g.key === activeFilter)?.label}`}
+              <div className="flex justify-between items-center text-gray-600 text-xs mb-4">
+                <div>
+                  Showing {Math.min(filtered.length, (currentPage - 1) * PLAYERS_PER_PAGE + 1)}-{Math.min(filtered.length, currentPage * PLAYERS_PER_PAGE)} of {filtered.length} player{filtered.length !== 1 ? 's' : ''} found
+                  {activeFilter !== 'all' && ` in ${gamemodes.find(g => g.key === activeFilter)?.label}`}
+                </div>
+                <div>
+                  Page {currentPage} of {totalPages}
+                </div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 stagger">
-                {filtered.map((player) => {
-                  const info = globalRankings.get(player.name)
-                  return (
-                    <PlayerCard
-                      key={player.name}
-                      player={player}
-                      totalPoints={info?.totalPoints}
-                      overallRank={info?.rank}
-                      overallTier={info?.overallTier}
-                    />
-                  )
-                })}
+
+              {/* Player Card Container with Transition */}
+              <div className={`transition-opacity duration-200 ease-in-out ${isFading ? 'opacity-0' : 'opacity-100'}`}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 stagger">
+                  {paginatedPlayers.map((player) => {
+                    const info = globalRankings.get(player.name)
+                    return (
+                      <PlayerCard
+                        key={player.name}
+                        player={player}
+                        totalPoints={info?.totalPoints}
+                        overallRank={info?.rank}
+                        overallTier={info?.overallTier}
+                      />
+                    )
+                  })}
+                </div>
               </div>
+
+              {/* Modern Premium Pagination Controls */}
+              {totalPages > 1 && (
+                <div className="mt-12 flex justify-center">
+                  <nav 
+                    className="glass flex items-center justify-between gap-1 sm:gap-3 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl border border-white/5 shadow-lg shadow-black/40 relative overflow-hidden"
+                    aria-label="Pagination"
+                  >
+                    {/* Soft background glow decoration */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#00BFFF]/5 to-[#0066FF]/5 pointer-events-none" />
+
+                    {/* First Page */}
+                    <button
+                      onClick={() => handlePageChange(1)}
+                      disabled={currentPage === 1}
+                      className="p-2.5 sm:p-3 rounded-lg text-gray-400 hover:text-white hover:bg-[#00BFFF]/10 border border-transparent hover:border-[#00BFFF]/20 transition-all duration-200 disabled:opacity-30 disabled:pointer-events-none focus:outline-none focus:ring-1 focus:ring-[#00BFFF]/50"
+                      aria-label="Go to first page"
+                    >
+                      <ChevronsLeft className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-200 active:-translate-x-1" />
+                    </button>
+
+                    {/* Previous Page */}
+                    <button
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className="p-2.5 sm:p-3 rounded-lg text-gray-400 hover:text-white hover:bg-[#00BFFF]/10 border border-transparent hover:border-[#00BFFF]/20 transition-all duration-200 disabled:opacity-30 disabled:pointer-events-none focus:outline-none focus:ring-1 focus:ring-[#00BFFF]/50"
+                      aria-label="Go to previous page"
+                    >
+                      <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-200 active:-translate-x-1" />
+                    </button>
+
+                    {/* Current Page Indicator */}
+                    <div className="px-3 sm:px-6 py-1 mx-1 flex flex-col items-center justify-center min-w-[100px] sm:min-w-[140px] select-none text-center">
+                      <span className="text-gray-400 text-[10px] sm:text-xs font-semibold uppercase tracking-wider">
+                        Rankings Navigation
+                      </span>
+                      <span className="font-['Space_Grotesk'] text-sm sm:text-base font-bold text-white mt-0.5">
+                        Page <span className="text-gradient font-black">{currentPage}</span> <span className="text-gray-600 font-normal">/</span> {totalPages}
+                      </span>
+                    </div>
+
+                    {/* Next Page */}
+                    <button
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                      className="p-2.5 sm:p-3 rounded-lg text-gray-400 hover:text-white hover:bg-[#00BFFF]/10 border border-transparent hover:border-[#00BFFF]/20 transition-all duration-200 disabled:opacity-30 disabled:pointer-events-none focus:outline-none focus:ring-1 focus:ring-[#00BFFF]/50"
+                      aria-label="Go to next page"
+                    >
+                      <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-200 active:translate-x-1" />
+                    </button>
+
+                    {/* Last Page */}
+                    <button
+                      onClick={() => handlePageChange(totalPages)}
+                      disabled={currentPage === totalPages}
+                      className="p-2.5 sm:p-3 rounded-lg text-gray-400 hover:text-white hover:bg-[#00BFFF]/10 border border-transparent hover:border-[#00BFFF]/20 transition-all duration-200 disabled:opacity-30 disabled:pointer-events-none focus:outline-none focus:ring-1 focus:ring-[#00BFFF]/50"
+                      aria-label="Go to last page"
+                    >
+                      <ChevronsRight className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-200 active:translate-x-1" />
+                    </button>
+                  </nav>
+                </div>
+              )}
             </>
           ) : (
             <div className="text-center py-24">
@@ -257,3 +375,4 @@ function RankingsPage() {
     </div>
   )
 }
+
