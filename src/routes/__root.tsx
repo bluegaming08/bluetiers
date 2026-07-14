@@ -9,8 +9,13 @@ export const Route = createRootRoute({
       { title: 'Blue Tiers | #1 Minecraft PvP Tier List' },
       { name: 'description', content: '#1 Tier List for all types of Minecraft PvP players.' },
       { name: 'theme-color', content: '#00BFFF' },
+      { name: 'og:url', content: 'https://bluetiers.bolt.host' },
+      { name: 'og:type', content: 'website' },
+      { name: 'og:title', content: 'Blue Tiers | #1 Minecraft PvP Tier List' },
+      { name: 'og:description', content: '#1 Tier List for all types of Minecraft PvP players.' },
     ],
     links: [
+      { rel: 'canonical', href: 'https://bluetiers.bolt.host' },
       { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
       {
         rel: 'preconnect',
