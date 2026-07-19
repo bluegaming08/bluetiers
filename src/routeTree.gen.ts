@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RankingsRouteImport } from './routes/rankings'
+import { Route as ApiPlayerChar91usernameChar93RouteImport } from './routes/api/player/[username]'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,31 +23,41 @@ const RankingsRoute = RankingsRouteImport.update({
   path: '/rankings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPlayerChar91usernameChar93Route =
+  ApiPlayerChar91usernameChar93RouteImport.update({
+    id: '/api/player/username',
+    path: '/api/player/username',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/rankings': typeof RankingsRoute
+  '/api/player/username': typeof ApiPlayerChar91usernameChar93Route
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/rankings': typeof RankingsRoute
+  '/api/player/username': typeof ApiPlayerChar91usernameChar93Route
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/rankings': typeof RankingsRoute
+  '/api/player/username': typeof ApiPlayerChar91usernameChar93Route
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/rankings'
+  fullPaths: '/' | '/rankings' | '/api/player/username'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/rankings'
-  id: '__root__' | '/' | '/rankings'
+  to: '/' | '/rankings' | '/api/player/username'
+  id: '__root__' | '/' | '/rankings' | '/api/player/username'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   RankingsRoute: typeof RankingsRoute
+  ApiPlayerChar91usernameChar93Route: typeof ApiPlayerChar91usernameChar93Route
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +76,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RankingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/player/username': {
+      id: '/api/player/username'
+      path: '/api/player/username'
+      fullPath: '/api/player/username'
+      preLoaderRoute: typeof ApiPlayerChar91usernameChar93RouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   RankingsRoute: RankingsRoute,
+  ApiPlayerChar91usernameChar93Route: ApiPlayerChar91usernameChar93Route,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
