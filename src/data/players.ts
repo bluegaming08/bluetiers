@@ -225,20 +225,6 @@ const players: Player[] = [
     },
   },
   {
-    name: "raincakecat",
-    head: "https://mc-heads.net/avatar/raincakecat",
-    region: "North America",
-    ranks: {
-      sword: "HT4",
-      uhc: "LT4",
-      crystal: "HT3",
-      mace: "HT4",
-      axe: "LT3",
-      nethpot: "LT3",
-      diapot: "LT3",
-    },
-  },
-  {
     name: "adambobjh22",
     head: "https://mc-heads.net/avatar/adambobjh22",
     region: "Europe",
